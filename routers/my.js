@@ -36,7 +36,9 @@ router.get('/detail', async (req, res) => {
 
 // 修改个人信息
 router.post('/edit', async (req, res) => {
+  const { _id } = req.session.userInfo
   User.update({
+    _id,
     ...req.body
   }).then(() => {
     res.json({
