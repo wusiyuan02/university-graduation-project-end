@@ -8,9 +8,9 @@ module.exports = new mongoose.Schema({
         default: false
     },
     // 头像
-    avater: {
+    avatar: {
         type: String,
-        default: 'http://localhost:3001/public/img/avater.jpg'
+        default: 'http://localhost:8088/public/img/avatar.jpg'
     },
     signature: {
         type: String,
@@ -50,6 +50,15 @@ module.exports = new mongoose.Schema({
         type: String,
     },
     registerTime: {
+        type: String
+    },
+    personTags: {
+        type: [String]
+    },
+    loveTags: {
+        type: [String]
+    },
+    innerMonologue: {
         type: String
     }
 });

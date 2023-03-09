@@ -12,7 +12,7 @@ let client = new OSS({
     accessKeySecret: '******'
 });
 client.useBucket('******');
-async function put (fileName,filePath,cb) {
+async function put(fileName, filePath, cb) {
     try {
         let result = await client.put(fileName, filePath);
         fs.unlinkSync('public/img/' + result.name);
@@ -36,10 +36,10 @@ let Storage = multer.diskStorage({
         cb(null, fileName)
     }
 });
-let upload = multer({storage: Storage}).any();//file2表示图片上传文件的key
-let avater = multer({storage: Storage}).single('avater');
-router.post('/uploadAvater', function (req, res, next) {
-    avater(req, res, function (err) {
+let upload = multer({ storage: Storage }).any();//file2表示图片上传文件的key
+let avatar = multer({ storage: Storage }).single('avatar');
+router.post('/uploadavatar', function (req, res, next) {
+    avatar(req, res, function (err) {
         let username = req.body.username;
         let imgs;
         let oldVal = req.body.oldVal || '';
@@ -57,12 +57,12 @@ router.post('/uploadAvater', function (req, res, next) {
         let i = 0;
         let item = req.file;
         let filePath = `./public/img/${item.filename}`;
-        put(fileName,filePath,(result)=>{
+        put(fileName, filePath, (result) => {
             imgs = result.url;
             User.update({
                 _id: username
             }, {
-                avater: imgs
+                avatar: imgs
             }).then(() => {
                 res.json({
                     code: '0',
@@ -99,7 +99,7 @@ router.post('/uploadFile', function (req, res, next) {
         let i = 0;
         req.files.forEach((item, index) => {
             let filePath = `./public/img/${item.filename}`;
-            put(item.filename,filePath,(result)=>{
+            put(item.filename, filePath, (result) => {
                 imgs.push(result.url);
                 i++;
                 if (i === req.files.length) {

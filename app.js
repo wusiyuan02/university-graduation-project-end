@@ -6,12 +6,13 @@ let path = require('path')
 let session = require('express-session')
 let socketio = require('socket.io')
 let socketHandler = require('./socket') //socket要实现的具体逻
-
+const cors = require('cors')
 let User = require('./models/User')
 let Idtoid = require('./models/Idtoid')
 
 const webConfig = require('./web.config')
 let app = express()
+
 
 app.use(bodyParser.json({ limit: '50mb' })) //限制文件大小
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
@@ -26,6 +27,7 @@ app.use(
     },
   })
 )
+
 app.use('/public', express.static(__dirname + '/public')) //设置静态资源
 
 //设置登录用户的session
@@ -38,7 +40,7 @@ app.use((req, res, next) => {
       }).then((userInfo) => {
         req.userInfo.isAdmin = Boolean(userInfo.isAdmin)
         req.userInfo.username = userInfo.username
-        req.userInfo.avater = userInfo.avater
+        req.userInfo.avatar = userInfo.avatar
         req.userInfo.signature = userInfo.signature
         next()
       })
@@ -51,7 +53,6 @@ app.use((req, res, next) => {
 //划分模块
 app.use('/chat', require('./routers/chat'))
 app.use('/comment', require('./routers/comment'))
-app.use('/profile', require('./routers/profile'))
 app.use('/my', require('./routers/my'))
 app.use('/pyq', require('./routers/pyq'))
 app.use('/search', require('./routers/search'))
@@ -92,7 +93,7 @@ mongoose.connect(
               from_user: data.from_user,
               message: data.message,
               time: data.time,
-              avater: data.avater,
+              avatar: data.avatar,
               _id: data._id,
             })
           })

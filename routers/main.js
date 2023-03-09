@@ -95,17 +95,23 @@ router.post('/user/login', (req, res, next) => {
       responseData.userInfo = {
         _id: userInfo._id,
         username: username,
+        nickname: userInfo.nickname,
+        avatar: userInfo.avatar,
       }
       req.session.userInfo = {
         _id: userInfo._id,
       }
       res.json(responseData)
-      return 0
+      return
     })
   })
 })
+
+// 登出
 router.get('/user/logout', (req, res) => {
-  req.session.userInfo = null
+  if (req.session.userInfo) {
+    req.session.userInfo = null
+  }
   res.json(responseData)
 })
 

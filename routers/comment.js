@@ -42,14 +42,14 @@ router.get('/getcom', (req, res) => {
     let username = req.query.username;
     Comment.find({
         $or: [{
-                from: {$ne: username},
-                to: username
-            },
-            {
-                from: {$ne: username},
-                writer: username
-            }]
-    }).populate(['pyq']).sort({_id: -1}).then((com) => {
+            from: { $ne: username },
+            to: username
+        },
+        {
+            from: { $ne: username },
+            writer: username
+        }]
+    }).populate(['pyq']).sort({ _id: -1 }).then((com) => {
         let i = 0;
         let rs = [];
         com.forEach((item) => {
@@ -71,12 +71,12 @@ router.get('/getcom', (req, res) => {
                 if (pyq.pimg.length) {
                     temp.footerimg = pyq.pimg[0]
                 } else {
-                    temp.footerimg = pyq.writer.avater
+                    temp.footerimg = pyq.writer.avatar
                 }
                 User.findOne({
                     username: item.from
                 }).then((user) => {
-                    temp.headerimg = user.avater;
+                    temp.headerimg = user.avatar;
                     rs.push(temp);
                     i++;
                     if (i === com.length) {
@@ -94,14 +94,14 @@ router.get('/getcom', (req, res) => {
 router.get('/clearcomunread', (req, res) => {
     let username = req.query.username;
     Comment.update(
-        {to: username},
-        {toisn: false},
-        {multi: true}
+        { to: username },
+        { toisn: false },
+        { multi: true }
     ).then(() => {
         Comment.update(
-            {writer: username},
-            {isn: false},
-            {multi: true}
+            { writer: username },
+            { isn: false },
+            { multi: true }
         ).then(() => {
             res.json({
                 code: 0
@@ -113,15 +113,15 @@ router.get('/getmsg', (req, res) => {
     let username = req.query.username;
     Comment.find({
         $or: [{
-            from: {$ne: username},
+            from: { $ne: username },
             to: username,
             toisn: true
         },
-            {
-                from: {$ne: username},
-                writer: username,
-                isn: true,
-            }]
+        {
+            from: { $ne: username },
+            writer: username,
+            isn: true,
+        }]
     }).then((rs) => {
         res.json({
             code: 0,
