@@ -3,23 +3,21 @@ let express = require('express');
 let mongoose = require('mongoose');
 
 module.exports = new mongoose.Schema({
-    user_id:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+    sendUsername: {
+        type: String
     },
-    chatWith:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+    receiverUsername: {
+        type: String
     },
-    addTime:{
-        type:Date,
-        default:Date.now
+    sendTime: {
+        type: Date,
+        default: Date.now()
     },
-    content:{
-        type:String
+    content: {
+        type: String
     },
-    unread:{
-        type:Boolean,
-        default:true
+    isRead: {
+        type: Boolean,
+        default: false
     }
 });

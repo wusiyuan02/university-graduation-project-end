@@ -9,7 +9,7 @@ let socketio = require("socket.io");
 let socketHandler = require("./socket"); //socket要实现的具体逻
 // const cors = require("cors");
 let User = require("./models/User");
-let Idtoid = require("./models/Idtoid");
+let ChatContent = require("./models/ChatContent");
 
 const webConfig = require("./web.config");
 let app = express();
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
         req.userInfo.signature = userInfo.signature;
         next();
       });
-    } catch (e) {}
+    } catch (e) { }
   } else {
     next();
   }
@@ -73,33 +73,23 @@ mongoose.connect(
       const server = http.Server(app);
       const io = socketio(server);
       io.on("connection", (socket) => {
-        console.log(socket.id);
-        // io.emit("ok", "123");
-        // io.emit("connect");
-        // io.on("login", (username) => {
-        //   socketHandler.saveUserSocketId(username, socketId);
-        // });
-        // io.on("comment", (toUserName) => {
-        //   Idtoid.findOne({
-        //     username: toUserName,
-        //   }).then((rs) => {
-        //     io.to(rs.socketid).emit("receiveComment");
-        //   });
-        // });
-        // io.on("chat", (data) => {
-        //   console.log(data);
-        //   Idtoid.findOne({
-        //     username: data.to_user,
-        //   }).then((rs) => {
-        //     io.to(rs.socketid).emit("receiveMsg", {
-        //       from_user: data.from_user,
-        //       message: data.message,
-        //       time: data.time,
-        //       avatar: data.avatar,
-        //       _id: data._id,
-        //     });
-        //   });
-        // });
+        socket.on("sendMessage", ({ sendUsername, receiverUsername, content, sendTime }, cb) => {
+          const cc = new ChatContent({ sendUsername, receiverUsername, content, sendTime })
+          cc.save().then((res) => {
+            cb(res)
+            socket.broadcast.emit('receiveMessage', res)
+          })
+        });
+
+        socket.on("changeMessageStatus", ({ _id, ...params }, cb) => {
+          ChatContent.findOneAndUpdate(
+            { _id },
+            {
+              ...params,
+            }).then(() => {
+              cb({ code: 0 })
+            })
+        });
       });
       server.listen(3000, () => {
         console.log("socket server running in http://localhost:3000");
