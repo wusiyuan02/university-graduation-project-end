@@ -235,7 +235,7 @@ router.post("/list", async (req, res) => {
 });
 
 
-// 拒绝好友申请
+// 
 router.get("/allMessage", async (req, res) => {
   if (!req.session.userInfo) {
     res.json({
@@ -255,11 +255,21 @@ router.get("/allMessage", async (req, res) => {
     const messageKey = receiverUsername === username ? sendUsername : receiverUsername;
     pre[messageKey] = [...(pre[messageKey] || []), nowMessageInfo]
     return pre
-  }, [])
+  }, {})
+
+  const flagData = Object.keys(data).reduce((pre, nowDataKey) => {
+    const nowDataValue = data[nowDataKey];
+    const isRead = nowDataValue.filter(value => value.receiverUsername === username).every(value => value.isRead)
+    pre[nowDataKey] = isRead;
+    return pre;
+  }, {})
 
   res.json({
     code: 0,
-    data,
+    data: {
+      messageData: data,
+      flagData
+    },
     msg: "请求成功",
   });
 })

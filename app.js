@@ -6,7 +6,6 @@ let bodyParser = require("body-parser");
 let session = require("express-session");
 const http = require("http");
 let socketio = require("socket.io");
-let socketHandler = require("./socket"); //socket要实现的具体逻
 
 // const cors = require("cors");
 let User = require("./models/User");
@@ -74,9 +73,12 @@ mongoose.connect(
     } else {
       console.log("数据库连接成功！");
       const server = http.Server(app);
+
       const io = socketio(server);
+
       io.on("connection", (socket) => {
         const socketId = socket.id
+
         socket.on("login", async ({ username }) => {
           if ((await Idtoid.find({ username })).length > 0) {
             await Idtoid.findOneAndUpdate({ username }, { socketid: socketId })
@@ -84,6 +86,7 @@ mongoose.connect(
           }
           new Idtoid({ username, socketid: socketId }).save()
         })
+
         // 存储用户的个人id
         socket.on("sendMessage", ({ sendUsername, receiverUsername, content, sendTime }, cb) => {
           const cc = new ChatContent({ sendUsername, receiverUsername, content, sendTime })
@@ -96,14 +99,8 @@ mongoose.connect(
           })
         });
 
-        socket.on("changeMessageStatus", ({ _id, ...params }, cb) => {
-          ChatContent.findOneAndUpdate(
-            { _id },
-            {
-              ...params,
-            }).then(() => {
-              cb({ code: 0 })
-            })
+        socket.on("readMessage", ({ sendUsername, receiverUsername }) => {
+          ChatContent.where({ sendUsername, receiverUsername }).update({ isRead: true }, () => { })
         });
       });
       server.listen(3000, () => {
