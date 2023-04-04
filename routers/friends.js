@@ -1,8 +1,11 @@
 let express = require("express");
-let router = express.Router();
-const User = require("../models/User");
-const FriendsApplication = require("../models/FriendsApplication");
 const dayjs = require("dayjs");
+
+const User = require("../models/User");
+const ChatContent = require("../models/ChatContent");
+const FriendsApplication = require("../models/FriendsApplication");
+
+let router = express.Router();
 
 let responseData;
 
@@ -231,4 +234,33 @@ router.post("/list", async (req, res) => {
   }
 });
 
+
+// 拒绝好友申请
+router.get("/allMessage", async (req, res) => {
+  if (!req.session.userInfo) {
+    res.json({
+      code: 1,
+      msg: "用户信息失效，请重新登录",
+    });
+    return;
+  }
+
+  const { username } = req.session.userInfo;
+  const messageInfos = await ChatContent.find({
+    $or: [{ receiverUsername: username }, { sendUsername: username }]
+  });
+
+  const data = messageInfos.reduce((pre, nowMessageInfo) => {
+    const { receiverUsername, sendUsername } = nowMessageInfo
+    const messageKey = receiverUsername === username ? sendUsername : receiverUsername;
+    pre[messageKey] = [...(pre[messageKey] || []), nowMessageInfo]
+    return pre
+  }, [])
+
+  res.json({
+    code: 0,
+    data,
+    msg: "请求成功",
+  });
+})
 module.exports = router;

@@ -7,12 +7,15 @@ let session = require("express-session");
 const http = require("http");
 let socketio = require("socket.io");
 let socketHandler = require("./socket"); //socket要实现的具体逻
+
 // const cors = require("cors");
 let User = require("./models/User");
 let ChatContent = require("./models/ChatContent");
+const Idtoid = require("./models/Idtoid");
 
 const webConfig = require("./web.config");
-let app = express();
+
+const app = express();
 
 app.use(bodyParser.json({ limit: "50mb" })); //限制文件大小
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
@@ -73,6 +76,7 @@ mongoose.connect(
       const server = http.Server(app);
       const io = socketio(server);
       io.on("connection", (socket) => {
+        // 存储用户的个人id
         socket.on("sendMessage", ({ sendUsername, receiverUsername, content, sendTime }, cb) => {
           const cc = new ChatContent({ sendUsername, receiverUsername, content, sendTime })
           cc.save().then((res) => {
