@@ -10,8 +10,7 @@ module.exports = new mongoose.Schema({
         type: String
     },
     sendTime: {
-        type: Date,
-        default: Date.now()
+        type: String,
     },
     content: {
         type: String
